@@ -14,8 +14,7 @@ This project is a simple desktop application that converts any image into a real
 
 🚀 How to Run
   1. Clone the repository 
-      git clone https://github.com/your-username/pencil-sketch-app.git
-      cd pencil-sketch-app
+      cd <To file directory>
   2. Install Dependecies
       pip install opencv-python pillow
       pip install opencv-python
