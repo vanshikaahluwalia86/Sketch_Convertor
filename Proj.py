@@ -3,6 +3,7 @@ import numpy as np
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+
 def pencil_sketch(image_path):
     img = cv2.imread(image_path)
     if img is None:
@@ -18,6 +19,9 @@ def pencil_sketch(image_path):
     inverted_blur = cv2.bitwise_not(blur)
     sketch = cv2.divide(gra, inverted_blur, scale=256.0)
 
+    kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+    sketch = cv2.filter2D(sketch, -1, kernel)
+
     return sketch
 
 def open_image():
@@ -28,14 +32,26 @@ def open_image():
             show_sketch(sketch)
 
 def show_sketch(sketch):
-    # Convert OpenCV image (numpy array) to PIL format
     img_rgb = cv2.cvtColor(sketch, cv2.COLOR_GRAY2RGB)
     img_pil = Image.fromarray(img_rgb)
+
+    # Get screen size and resize if needed
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    max_width = screen_width - 100
+    max_height = screen_height - 100
+    if img_pil.width > max_width or img_pil.height > max_height:
+        img_pil.thumbnail((max_width, max_height), Image.LANCZOS)
+
     img_tk = ImageTk.PhotoImage(img_pil)
 
-    # Create a new window to show the image
     top = tk.Toplevel()
     top.title("Pencil Sketch Result")
+    # Center the window
+    x = (screen_width - img_pil.width) // 2
+    y = (screen_height - img_pil.height) // 2
+    top.geometry(f"{img_pil.width}x{img_pil.height}+{x}+{y}")
+
     lbl = tk.Label(top, image=img_tk)
     lbl.image = img_tk  # Keep a reference!
     lbl.pack()
